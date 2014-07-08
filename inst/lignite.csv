@@ -1,0 +1,13 @@
+# Sieve test data, use this format! Must have at least two columns. Must have even number of columns. Do not remove this row!
+Description	Sivetest Package Lignite Coal Demo	Description	Sivetest Package Lignite Coal Demo	Description	Sivetest Package Lignite Coal Demo
+Title	Lignite	Title	Lignite	Title	Lignite
+Sample	Sample_1	Sample	Sample_2	Sample	Sample_3
+Unit	Mill_3	Unit	Mill_3	Unit	Mill_3
+Date	2014-05-01	Date	2014-05-01	Date	2014-05-01
+# Sieving data. Must contain header! Do not change header names. Do not remove this row!
+aperture	retained	aperture	retained	aperture	retained
+1000	0.000	1000	0.001	500	1.01
+500	2.01	500	1.01	200	20
+200	24	200	20	90	46.8
+90	43.8	90	46.8	0	32.189
+0	30.189	0	32.189		

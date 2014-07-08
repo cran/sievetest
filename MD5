@@ -1,0 +1,17 @@
+2e824a2d3b8ce28198a880d36f9e112d *DESCRIPTION
+012592abf4b40a8d741b299df2ded05a *NAMESPACE
+a9578e3144c4e6fb8becf92d574de645 *R/sieve_test.R
+85b1c71e0299b37a1005c8203ad9ee87 *data/lignite.rda
+d0d75ee7f5b168dc52b14437e18661a0 *demo/00Index
+0cc289b90390089963f1cdc31a710c08 *demo/sievetest.R
+e93edd19f233273399d0a1298aacf579 *inst/lignite.csv
+2b267f359a2fa8fda01e9bbea2cb3012 *man/c.std.Rd
+645afbbea8baefd7f4c81fd36a57e7d6 *man/desc.std.Rd
+2afe93a11ae57b5cd9b58686dd686c59 *man/drr.Rd
+f8989074210ac4935001c8471d130d0e *man/lignite.Rd
+0bcf635b9af6b07b6d7155c3d585ee7a *man/plot.std.Rd
+de72f4a93a3085c191c085d0857fcd03 *man/read.std.Rd
+09646a92817508ef7e0040d6e163e5b7 *man/rrx2x.Rd
+ee5ba0483b3da6ebc97674a14c5fed75 *man/std.Rd
+be2cbcc5324a64eaeb75c71e6f79f050 *man/summary.std.Rd
+e9710529c7de3336ca829048db9f0869 *man/tweak.std.Rd
