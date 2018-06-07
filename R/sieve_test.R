@@ -1,5 +1,5 @@
 #
-#  Copyright 2014 Petr Matoušů <pmatousu@more-praha.cz>
+#  Copyright 2014 Petr Matousu <pmatousu@more-praha.cz>
 #
 #  This program is free software; you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -21,6 +21,7 @@
 #:  desc.std    makes description metadata
 #:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
+#' @export
 desc.std <- function(Description=NA,Title=NA,Sample=NA,Unit=NA,Date=NA,x=NULL)  {
 
 #  merges lists, if not NA y overwrites x
@@ -61,12 +62,13 @@ ml <- function(x, y) {
 #:  create std object by hand
 #:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
+#' @export
 std <- function(a,r,desc=desc.std(),lmargs=list())  {
   # a ... apertures
   # r ... mass % retained on sieve
   stopifnot(length(a) == length(r),is.list(lmargs),is.list(desc))
   tab <- data.frame(a,r)
-  tab <- na.exclude(tab)
+  tab <- stats::na.exclude(tab)
   metadata <- desc
   names(tab) <- c("a","r")
   if (!sum(tab$r) == 100) {
@@ -134,10 +136,11 @@ std <- function(a,r,desc=desc.std(),lmargs=list())  {
 #:  read std data from CSV
 #:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
+#' @export
 read.std <- function(file, sep="\t", dec=".")  {
   stopifnot(file.exists(file))
   # get number of columns
-  hd <- ncol(read.table(file,header=F,sep=sep,stringsAsFactors=F,skip=7,nrows=1))
+  hd <- ncol(utils::read.table(file,header=F,sep=sep,stringsAsFactors=F,skip=7,nrows=1))
   if(hd%%2 != 0) stop("Data file must have even number of columns!")
   idx <-  matrix(seq_len(hd),ncol=2,byrow=T)
   ret <- list()
@@ -146,8 +149,8 @@ read.std <- function(file, sep="\t", dec=".")  {
     cC2 <- rep("NULL",hd)
     cC1[idx[i,]] <- "character"
     cC2[idx[i,]] <- "numeric"
-    tab <- read.table(file,header=T,sep=sep,dec=dec,stringsAsFactors=F,skip=7,colClasses=cC2)
-    meta <- read.table(file,header=F,sep=sep,dec=dec,stringsAsFactors=F,skip=0,nrows=5,comment.char="#",colClasses=cC1)
+    tab <- utils::read.table(file,header=T,sep=sep,dec=dec,stringsAsFactors=F,skip=7,colClasses=cC2)
+    meta <- utils::read.table(file,header=F,sep=sep,dec=dec,stringsAsFactors=F,skip=0,nrows=5,comment.char="#",colClasses=cC1)
     metadata <- meta[,2]
     names(metadata) <- meta[,1]
     ret[[i]] <- std(tab[,1],tab[,2],desc=as.list(metadata))
@@ -160,6 +163,7 @@ read.std <- function(file, sep="\t", dec=".")  {
 #:  modify std object
 #:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
+#' @export
 tweak.std <- function(x,desc=desc.std(x=x),lmargs=as.list(x[[1]]$lmfit$call[-c(1:3)]))  {
   stopifnot(is.std(x),length(x) == 1,is.list(lmargs),is.list(desc))
   # get data
@@ -174,6 +178,7 @@ tweak.std <- function(x,desc=desc.std(x=x),lmargs=as.list(x[[1]]$lmfit$call[-c(1
 #:  concatenate
 #:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
+#' @export
 c.std <- function(...)  {
   dots <- list(...)
   if(all(sapply(dots,is.std))){
@@ -189,6 +194,7 @@ c.std <- function(...)  {
 #:  subset
 #:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
+#' @export
 '[.std' <- function(x, i, ...) {
 structure(NextMethod("["), class = class(x))
 }
@@ -198,9 +204,13 @@ structure(NextMethod("["), class = class(x))
 #:  transform from usr to axis coordinates and vise versa
 #:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
+#' @export
 y2rry <- function(x) {log(log(100/x))}
+#' @export
 rry2y <- function(x) {100/exp(exp(x))}
+#' @export
 x2rrx <- function(x) {log(x)}
+#' @export
 rrx2x <- function(x) {exp(x)}
 
 
@@ -208,6 +218,7 @@ rrx2x <- function(x) {exp(x)}
 #:  plot
 #:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
+#' @export
 plot.std <-   function(x,
                        type=c("rr","rrdist"),
                        n=30, lgd=T,
@@ -247,7 +258,7 @@ plot.std <-   function(x,
 
   if (length(x) > length(col)) {
     warning("There is more samples than colors in palette! Forcing rainbow and disabling legend.")
-    col <- rainbow(length(x))
+    col <-grDevices::rainbow(length(x))
     lgd <- F
   }
 
@@ -280,10 +291,19 @@ plot.std <-   function(x,
     if(is.null(dots$lwd)) dots$lwd <- 1
 
     # common limits
+if (is.null(dots$xlim)) {
     limX <- lapply(x, FUN=function(x){x$stdata$X})
     limX <- range(unique(sort(do.call(c,limX))),finite=T,na.rm=T)
+} else {
+    limX <- dots$xlim
+}
+
+if (is.null(dots$ylim)) {
     limY <- lapply(x, FUN=function(x){x$stdata$Y})
     limY <- range(unique(sort(do.call(c,limY))),finite=T,na.rm=T)
+} else {
+    limY <- dots$ylim
+}
 
     # common labels
     # xaxis
@@ -361,8 +381,6 @@ plot.std <-   function(x,
       # oversize, undersize
       y_u <- urr(x=xx,ex=ex,xs=xs)
       y_o <- orr(x=xx,ex=ex,xs=xs)
-      
-   
       arg <- c(list(y_u ~ xx,type='l',col=col[i],lty=lty.u),dots)
       do.call('lines',arg)
       arg <- c(list(y_o  ~ xx,type='l',col=col[i],lty=lty.o),dots)
@@ -389,7 +407,7 @@ plot.std <-   function(x,
   eval(cmd)
 
   if (lgd) {
-    legend(x=lgd.x, fill=fill, border=border, pch=mypch, pt.lwd=1, lty=lty, lwd=2 , col=bg, pt.bg=bg, legend=lgdtext,bty='n', cex=1.14*dots$cex.axis)
+    graphics::legend(x=lgd.x, fill=fill, border=border, pch=mypch, pt.lwd=1, lty=lty, lwd=2 , col=bg, pt.bg=bg, legend=lgdtext,bty='n', cex=1.14*dots$cex.axis)
   }
 
 }
@@ -399,6 +417,7 @@ plot.std <-   function(x,
 #:  summary
 #:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
+#' @export
 summary.std <- function(object,...)  {
   su <- lapply(object,FUN=function(x){
     with(x,
@@ -421,6 +440,7 @@ return(su)
 #:  test is std?
 #:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
+#' @export
 is.std <- function(x)  {
   nms <- c("Description", "Title", "Sample", "Unit", "Date", "stdata", "lmfit", "RRcoefficients","size")
   is_list <- is.list(x)
@@ -437,14 +457,9 @@ is.std <- function(x)  {
 #:  RR distribution
 #:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
+#' @export
 drr <- function(x,ex,xs){(ex/xs)*(x/xs)^(ex-1)*exp(- (x/xs)^ex)}
-# drr2 <- function(x,ex,xs){(ex/xs^ex)*(x)^(ex-1)*exp(- (x/xs)^ex)}
+#' @export
 urr <- function(x,ex,xs){1-exp(- (x/xs)^ex)}
+#' @export
 orr <- function(x,ex,xs){exp(- (x/xs)^ex)}
-
-
-#:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-#:  notes
-#:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-#   TODO nahodit funkci pro vygenerovani pdf
-#   TODO read.std: too many hardcoded arguments
